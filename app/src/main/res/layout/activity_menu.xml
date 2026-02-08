@@ -1,19 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F8FAFB"
     android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Our Menu"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="#1A1A1A" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Our Menu"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black" />
+
+        <ImageButton
+            android:id="@+id/btnViewCart"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_cart_circle"
+            android:padding="8dp"
+            android:src="@drawable/ic_cart"
+            android:scaleType="centerInside"
+
+            android:contentDescription="View Cart"
+            android:elevation="6dp"/>
+
+
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/searchBar"
@@ -24,7 +47,9 @@
         android:hint="Search breakfast, lunch..."
         android:paddingStart="15dp"
         android:drawableStart="@android:drawable/ic_menu_search"
-        android:drawablePadding="10dp" />
+        android:drawablePadding="10dp"
+        android:textColor="@android:color/black"
+        android:textColorHint="@android:color/darker_gray" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMenuGrid"
@@ -33,4 +58,5 @@
         android:layout_marginTop="10dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="2" />
+
 </LinearLayout>

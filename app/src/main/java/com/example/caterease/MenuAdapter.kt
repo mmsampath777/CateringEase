@@ -28,12 +28,20 @@ class MenuAdapter(
         val item = itemList[position]
         holder.name.text = item.name
         holder.price.text = "₹${item.price}"
-        holder.img.setImageResource(item.imageRes)
+        holder.img.setImageResource(item.image)
 
-        // Use a simple color or icon for Veg/Non-Veg
         holder.type.setImageResource(if(item.isVeg) R.drawable.ic_veg else R.drawable.ic_nonveg)
 
-        holder.btnAdd.setOnClickListener { onAddClick(item) }
+        if (CartManager.isItemInCart(item)) {
+            holder.btnAdd.text = "Added"
+            holder.btnAdd.isEnabled = false
+        } else {
+            holder.btnAdd.text = "Add"
+            holder.btnAdd.isEnabled = true
+            holder.btnAdd.setOnClickListener { 
+                onAddClick(item)
+            }
+        }
     }
 
     override fun getItemCount() = itemList.size
