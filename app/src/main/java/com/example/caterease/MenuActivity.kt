@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -42,7 +43,7 @@ class MenuActivity : AppCompatActivity() {
         fullMenu.add(MenuItem(3, "Masala Dosa", 150.0, R.drawable.masala_dosa, true, "Breakfast"))
         fullMenu.add(MenuItem(4, "Mutton Sukka", 350.0, R.drawable.mutton_chukka, false, "Starters"))
         fullMenu.add(MenuItem(5, "Veg Meals", 180.0, R.drawable.veg_meals, true, "Lunch"))
-        fullMenu.add(MenuItem(6, "Gulab Jamun", 90.0, R.drawable.gulab, true, "Sweet"))
+        fullMenu.add(MenuItem(6, "Gulab Jamun", 90.0, R.drawable.bg_catering, true, "Sweet"))
 
         val rv = findViewById<RecyclerView>(R.id.rvMenuGrid)
         adapter = MenuAdapter(fullMenu) { item ->
@@ -70,6 +71,33 @@ class MenuActivity : AppCompatActivity() {
         val cartIcon = findViewById<ImageButton>(R.id.btnViewCart)
         cartIcon.setOnClickListener {
             startActivity(Intent(this, CartActivity::class.java))
+        }
+
+        // 4. Options menu click listener
+        val optionsMenuButton = findViewById<ImageButton>(R.id.btnOptionsMenu)
+        optionsMenuButton.setOnClickListener {
+            val popup = PopupMenu(this, it)
+            popup.menuInflater.inflate(R.menu.options_menu, popup.menu)
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_sort_name -> {
+                        fullMenu.sortBy { it.name }
+                        adapter.updateList(fullMenu)
+                        true
+                    }
+                    R.id.action_sort_price -> {
+                        fullMenu.sortBy { it.price }
+                        adapter.updateList(fullMenu)
+                        true
+                    }
+                    R.id.action_profile -> {
+                        Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
         }
     }
 }

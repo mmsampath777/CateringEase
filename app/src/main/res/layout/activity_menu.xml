@@ -21,6 +21,16 @@
             android:textColor="@android:color/black" />
 
         <ImageButton
+            android:id="@+id/btnOptionsMenu"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_toStartOf="@id/btnViewCart"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_more_vert"
+            android:contentDescription="Options"/>
+
+        <ImageButton
             android:id="@+id/btnViewCart"
             android:layout_width="44dp"
             android:layout_height="44dp"

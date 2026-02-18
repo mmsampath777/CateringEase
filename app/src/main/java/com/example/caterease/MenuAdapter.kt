@@ -42,6 +42,26 @@ class MenuAdapter(
                 onAddClick(item)
             }
         }
+
+        holder.itemView.setOnLongClickListener {
+            val popup = PopupMenu(holder.itemView.context, it)
+            popup.menuInflater.inflate(R.menu.popup_menu, popup.menu)
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_view_details -> {
+                        Toast.makeText(holder.itemView.context, "Viewing details for ${item.name}", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    R.id.action_add_to_favorites -> {
+                        Toast.makeText(holder.itemView.context, "${item.name} added to favorites", Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
+            true
+        }
     }
 
     override fun getItemCount() = itemList.size

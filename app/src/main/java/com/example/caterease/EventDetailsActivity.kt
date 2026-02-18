@@ -2,12 +2,15 @@ package com.example.caterease
 
 import android.Manifest
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.PopupMenu
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,6 +59,10 @@ class EventDetailsActivity : AppCompatActivity() {
             showDatePickerDialog()
         }
 
+        eventType.setOnClickListener {
+            showEventTypeMenu()
+        }
+
         proceedToOrderButton.setOnClickListener {
             if (validateInput()) {
                 requestNotificationPermission()
@@ -81,6 +88,32 @@ class EventDetailsActivity : AppCompatActivity() {
         )
         datePickerDialog.datePicker.minDate = System.currentTimeMillis() - 1000
         datePickerDialog.show()
+    }
+
+    private fun showEventTypeMenu() {
+        val popup = PopupMenu(this, eventType)
+        val eventTypes = arrayOf("Birthday", "Wedding", "Anniversary", "Corporate", "Other")
+        for (type in eventTypes) {
+            popup.menu.add(type)
+        }
+
+        popup.setOnMenuItemClickListener { item ->
+            val selectedType = item.title.toString()
+            if (selectedType == "Other") {
+                eventType.setText("")
+                eventType.isFocusable = true
+                eventType.isFocusableInTouchMode = true
+                eventType.requestFocus()
+                val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(eventType, InputMethodManager.SHOW_IMPLICIT)
+            } else {
+                eventType.setText(selectedType)
+                eventType.isFocusable = false
+                eventType.isFocusableInTouchMode = false
+            }
+            true
+        }
+        popup.show()
     }
 
     private fun validateInput(): Boolean {
