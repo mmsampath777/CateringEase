@@ -5,19 +5,24 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Geocoder
 import android.os.Build
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -29,6 +34,17 @@ class EventDetailsActivity : AppCompatActivity() {
     private lateinit var numPeople: EditText
     private lateinit var address: EditText
     private lateinit var phoneNumber: EditText
+    private lateinit var locationIcon: ImageView
+
+    private val locationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            getCurrentLocation()
+        } else {
+            Toast.makeText(this, "Location permission denied.", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +69,7 @@ class EventDetailsActivity : AppCompatActivity() {
         numPeople = findViewById(R.id.etNumPeople)
         address = findViewById(R.id.etAddress)
         phoneNumber = findViewById(R.id.etPhoneNumber)
+        locationIcon = findViewById(R.id.ivLocation)
         val proceedToOrderButton = findViewById<Button>(R.id.btnProceedToOrder)
 
         eventDate.setOnClickListener {
@@ -61,6 +78,10 @@ class EventDetailsActivity : AppCompatActivity() {
 
         eventType.setOnClickListener {
             showEventTypeMenu()
+        }
+
+        locationIcon.setOnClickListener {
+            requestLocationPermission()
         }
 
         proceedToOrderButton.setOnClickListener {
@@ -114,6 +135,66 @@ class EventDetailsActivity : AppCompatActivity() {
             true
         }
         popup.show()
+    }
+
+    private fun requestLocationPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                getCurrentLocation()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                Toast.makeText(this, "Location permission is required to fetch your address.", Toast.LENGTH_LONG).show()
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+            else -> {
+                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+    }
+
+    private fun getCurrentLocation() {
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+
+        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    val geocoder = Geocoder(this, Locale.getDefault())
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        geocoder.getFromLocation(location.latitude, location.longitude, 1) { addresses ->
+                            if (addresses.isNotEmpty()) {
+                                val fullAddress = addresses[0].getAddressLine(0)
+                                runOnUiThread { address.setText(fullAddress) }
+                            } else {
+                                runOnUiThread { Toast.makeText(this, "Address not found.", Toast.LENGTH_SHORT).show() }
+                            }
+                        }
+                    } else {
+                        try {
+                            @Suppress("DEPRECATION")
+                            val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
+                            if (addresses != null && addresses.isNotEmpty()) {
+                                val fullAddress = addresses[0].getAddressLine(0)
+                                address.setText(fullAddress)
+                            } else {
+                                Toast.makeText(this, "Address not found.", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(this, "Error getting address.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(this, "Unable to get current location.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to get location.", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun validateInput(): Boolean {
