@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Build
@@ -29,12 +30,16 @@ import java.util.Locale
 
 class EventDetailsActivity : AppCompatActivity() {
 
+    private lateinit var userName: EditText
     private lateinit var eventDate: EditText
     private lateinit var eventType: EditText
     private lateinit var numPeople: EditText
     private lateinit var address: EditText
     private lateinit var phoneNumber: EditText
     private lateinit var locationIcon: ImageView
+    
+    private lateinit var sharedPreferences: SharedPreferences
+    private val PREFS_NAME = "CaterEasePrefs"
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -49,6 +54,8 @@ class EventDetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_details)
+        
+        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
         val mainLayout = findViewById<ScrollView>(R.id.main)
         val initialPaddingTop = mainLayout.paddingTop
@@ -64,12 +71,17 @@ class EventDetailsActivity : AppCompatActivity() {
             insets
         }
 
+        userName = findViewById(R.id.etUserName)
         eventDate = findViewById(R.id.etEventDate)
         eventType = findViewById(R.id.etEventType)
         numPeople = findViewById(R.id.etNumPeople)
         address = findViewById(R.id.etAddress)
         phoneNumber = findViewById(R.id.etPhoneNumber)
         locationIcon = findViewById(R.id.ivLocation)
+        
+        val btnSave = findViewById<Button>(R.id.btnSaveData)
+        val btnRetrieve = findViewById<Button>(R.id.btnRetrieveData)
+        val btnClear = findViewById<Button>(R.id.btnClearData)
         val proceedToOrderButton = findViewById<Button>(R.id.btnProceedToOrder)
 
         eventDate.setOnClickListener {
@@ -83,12 +95,57 @@ class EventDetailsActivity : AppCompatActivity() {
         locationIcon.setOnClickListener {
             requestLocationPermission()
         }
+        
+        btnSave.setOnClickListener {
+            saveData()
+        }
+        
+        btnRetrieve.setOnClickListener {
+            retrieveData()
+        }
+        
+        btnClear.setOnClickListener {
+            clearData()
+        }
 
         proceedToOrderButton.setOnClickListener {
             if (validateInput()) {
                 requestNotificationPermission()
             }
         }
+    }
+
+    private fun saveData() {
+        val editor = sharedPreferences.edit()
+        editor.putString("user_name", userName.text.toString())
+        editor.putString("event_date", eventDate.text.toString())
+        editor.putString("num_people", numPeople.text.toString())
+        editor.apply()
+        Toast.makeText(this, "Data Saved Successfully", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun retrieveData() {
+        val name = sharedPreferences.getString("user_name", "")
+        val date = sharedPreferences.getString("event_date", "")
+        val people = sharedPreferences.getString("num_people", "")
+        
+        userName.setText(name)
+        eventDate.setText(date)
+        numPeople.setText(people)
+        
+        Toast.makeText(this, "Data Retrieved", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun clearData() {
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+        
+        userName.setText("")
+        eventDate.setText("")
+        numPeople.setText("")
+        
+        Toast.makeText(this, "Data Cleared", Toast.LENGTH_SHORT).show()
     }
 
     private fun showDatePickerDialog() {

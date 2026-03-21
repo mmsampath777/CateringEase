@@ -11,14 +11,39 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enter Event Details"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="20dp"
-            android:textColor="@android:color/black"/>
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enter Event Details"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"/>
+
+            <ImageButton
+                android:id="@+id/btnEventOptionsMenu"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_more_vert"
+                android:contentDescription="Options"/>
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/etUserName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="User Name"
+            android:inputType="textPersonName"
+            android:textColor="@android:color/black"
+            android:textColorHint="@android:color/darker_gray"
+            android:layout_marginBottom="15dp" />
 
         <EditText
             android:id="@+id/etEventDate"
@@ -48,7 +73,7 @@
             android:id="@+id/etNumPeople"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Number of People"
+            android:hint="Number of People / Guests"
             android:inputType="number"
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray"
@@ -90,6 +115,36 @@
             android:textColor="@android:color/black"
             android:textColorHint="@android:color/darker_gray"
             android:layout_marginBottom="20dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
+
+            <Button
+                android:id="@+id/btnSaveData"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Save"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/btnRetrieveData"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Retrieve"
+                android:layout_marginEnd="5dp" />
+
+            <Button
+                android:id="@+id/btnClearData"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Clear" />
+        </LinearLayout>
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnProceedToOrder"
